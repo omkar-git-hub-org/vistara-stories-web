@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 import { useReveal } from "./hooks/useReveal";
 
 export default function App() {
-  // Same IntersectionObserver scroll-reveal effect as the original site
+  // Saame IntersectionObserver scroll-reveal effect as the original site
   useReveal();
 
   return (
