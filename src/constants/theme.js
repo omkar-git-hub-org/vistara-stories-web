@@ -1,12 +1,13 @@
 // ============================================================
 // ELARA STUDIO — Design Tokens
-// Saare colors, fonts, spacing yaha constant hai.
-// Kahin bhi color change karna ho to sirf yaha karo.
+// Saare colors, fonts, spacing, API yaha constant hai.
 // ============================================================
 
-export const SITE_NAME = "ELARA STUDIO";
+export const SITE_NAME = "VISTARA STORIES";
 export const SITE_TAGLINE = "Capturing Eternity";
 export const ESTABLISHED_YEAR = "MMXIV";
+
+export const API_URL = "https://7g8fmbuxjc.execute-api.ap-south-1.amazonaws.com/events";
 
 export const COLORS = {
   primaryFixed: "#ffe088",
@@ -65,14 +66,15 @@ export const RADIUS = {
   full: "9999px",
 };
 
+// Fluid spacing — chhote screen pe kam, bade screen pe zyada, automatically
 export const SPACING = {
-  sectionGap: "160px",
+  sectionGap: "clamp(64px, 10vw, 160px)",
   stackMd: "16px",
-  marginDesktop: "80px",
-  gutter: "32px",
-  marginMobile: "24px",
+  marginDesktop: "clamp(24px, 6vw, 80px)",
+  gutter: "clamp(16px, 3vw, 32px)",
+  marginMobile: "clamp(16px, 5vw, 24px)",
   stackSm: "8px",
-  stackLg: "32px",
+  stackLg: "clamp(20px, 3vw, 32px)",
 };
 
 export const FONT_FAMILY = {
@@ -85,40 +87,24 @@ export const FONT_FAMILY = {
   headlineLg: ["Playfair Display"],
 };
 
+// Fluid font sizes — ab har device pe apne aap sahi size me scale honge
 export const FONT_SIZE = {
-  displayLgMobile: ["48px", { lineHeight: "56px", letterSpacing: "-0.01em", fontWeight: "400" }],
-  bodyLg: ["18px", { lineHeight: "32px", fontWeight: "400" }],
-  headlineMd: ["32px", { lineHeight: "40px", fontWeight: "400" }],
-  bodyMd: ["16px", { lineHeight: "28px", fontWeight: "400" }],
-  displayLg: ["80px", { lineHeight: "96px", letterSpacing: "-0.02em", fontWeight: "400" }],
+  displayLgMobile: ["clamp(2.25rem, 8vw, 3rem)", { lineHeight: "1.1", letterSpacing: "-0.01em", fontWeight: "400" }],
+  bodyLg: ["clamp(1rem, 0.6vw + 0.85rem, 1.125rem)", { lineHeight: "1.7", fontWeight: "400" }],
+  headlineMd: ["clamp(1.375rem, 1.2vw + 1rem, 2rem)", { lineHeight: "1.3", fontWeight: "400" }],
+  bodyMd: ["clamp(0.9rem, 0.4vw + 0.8rem, 1rem)", { lineHeight: "1.7", fontWeight: "400" }],
+  displayLg: ["clamp(2.75rem, 5vw + 1rem, 5rem)", { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "400" }],
   labelCaps: ["12px", { lineHeight: "16px", letterSpacing: "0.15em", fontWeight: "600" }],
-  headlineLg: ["48px", { lineHeight: "56px", fontWeight: "400" }],
+  headlineLg: ["clamp(1.75rem, 2.2vw + 1rem, 3rem)", { lineHeight: "1.15", fontWeight: "400" }],
 };
 
-// Placeholder images (data-alt text preserved as alt for accessibility)
 export const IMAGES = {
   hero: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
-    alt: "A cinematic, high-fashion vertical portrait of a woman in a dramatic flowing black silk gown standing on a volcanic black sand beach at twilight.",
-  },
-  cathedral: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
-    alt: "A grand wedding scene in a neo-gothic cathedral with dramatic shafts of light piercing through stained glass windows onto a couple standing at the altar.",
-  },
-  fashionCloseup: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
-    alt: "A striking close-up fashion portrait of a model with intricate avant-garde makeup and gold leaf detailing on her skin.",
-  },
-  mountains: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
-    alt: "A dramatic black and white landscape of rugged, sharp mountain peaks under a stormy, textured sky.",
-  },
-  event: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
-    alt: "An expansive, low-light photograph of a high-end luxury cocktail event in a glass-walled rooftop lounge overlooking a glowing city skyline at night.",
+    src: "https://cdnx.premiumread.com/?url=https://www.japantimes.co.jp/japantimes/uploads/images/2026/06/08/544414.jpg&amp;q=100&amp;f=webp&amp;t=1.53",
+    alt: "A cinematic, high-fashion vertical portrait of a woman in a dramatic flowing black silk gown at twilight.",
   },
   elaraPortrait: {
-    src: "https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg",
+    src: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
     alt: "A professional, moody headshot of a woman named Elara with a sophisticated and confident expression.",
   },
 };
