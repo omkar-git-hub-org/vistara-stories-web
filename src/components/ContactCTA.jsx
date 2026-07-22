@@ -1,6 +1,6 @@
 export default function ContactCTA() {
   return (
-    <section className="py-section-gap px-margin-mobile bg-background relative overflow-hidden">
+    <section id="contact" className="py-section-gap px-margin-mobile bg-background relative overflow-hidden">
       <div className="relative z-10 text-center max-w-2xl mx-auto">
         <h2 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface uppercase italic mb-stack-md leading-none">
           Let's Create <br /> Magic

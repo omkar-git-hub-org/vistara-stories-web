@@ -1,77 +1,182 @@
-import { IMAGES } from "../constants/theme";
+// =====================================================================
+// SECTION: IMPORTS
+// =====================================================================
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEvents } from "../hooks/useEvents";
+import Container from "./Container";
+import CoverCard from "./CoverCard";
 
-const FILTERS = ["ALL", "Weddings", "Portraits", "Fashion"];
+// =====================================================================
+// SECTION: CUSTOM HOOK – Responsive breakpoint (matches Tailwind md/lg)
+// =====================================================================
+const useBreakpoint = () => {
+  const [bp, setBp] = useState("mobile");
 
-export default function Portfolio() {
+  useEffect(() => {
+    const calc = () => {
+      const w = window.innerWidth;
+      if (w >= 1024) setBp("desktop");    // lg
+      else if (w >= 768) setBp("tablet"); // md
+      else setBp("mobile");
+    };
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, []);
+
+  return bp;
+};
+
+// Config: har breakpoint ke liye max cards aur kitne columns
+// (rows deliberately fix NAHI ki gayi — auto-size hoti hain content ke hisaab se,
+// warna items kam hone par grid khaali black rows reserve kar leta hai)
+const GRID_CONFIG = {
+  mobile: { count: 3, gridClass: "grid-cols-1" },
+  tablet: { count: 4, gridClass: "grid-cols-2" },
+  desktop: { count: 9, gridClass: "grid-cols-3" },
+};
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – Loading Skeleton
+// =====================================================================
+const LoadingSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-3 lg:gap-4 animate-pulse">
+    {Array.from({ length: 9 }).map((_, i) => (
+      <div
+        key={i}
+        className="bg-surface-container-low rounded-2xl aspect-[4/3]"
+      />
+    ))}
+  </div>
+);
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – Error State
+// =====================================================================
+const ErrorState = ({ message }) => (
+  <div className="flex flex-col items-center justify-center py-12">
+    <p className="font-body-lg text-body-lg text-error text-center">{message}</p>
+    <button
+      onClick={() => window.location.reload()}
+      className="mt-4 px-6 py-2 border border-primary/40 rounded-full text-label-caps text-primary hover:bg-primary hover:text-background transition-all"
+    >
+      Retry
+    </button>
+  </div>
+);
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – Empty State
+// =====================================================================
+const EmptyState = () => (
+  <div className="flex flex-col items-center justify-center py-12">
+    <p className="font-body-lg text-body-lg text-on-surface-variant text-center">
+      No events found.
+    </p>
+  </div>
+);
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – See All Button
+// =====================================================================
+const SeeAllButton = ({ onClick }) => (
+  <div className="flex justify-center mt-8 md:mt-10">
+    <button
+      onClick={onClick}
+      className="px-8 py-3 border border-primary rounded-full text-label-caps font-label-caps text-primary hover:bg-primary hover:text-background transition-all duration-500 uppercase tracking-widest backdrop-blur-sm bg-primary/5 hover:shadow-lg hover:shadow-primary/20 transform hover:scale-105 active:scale-95"
+    >
+      See All
+    </button>
+  </div>
+);
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – Section Title
+// =====================================================================
+const SectionTitle = ({ title }) => (
+  <div className="mb-6 md:mb-8 flex flex-col items-start">
+    <p className="font-label-caps text-xs sm:text-sm tracking-[0.3em] text-primary/80 uppercase mb-2">
+      Our Work
+    </p>
+    <h2 className="font-display font-bold text-headline-lg-mobile md:text-headline-lg text-on-surface uppercase italic leading-tight">
+      {title}
+    </h2>
+    <span className="mt-3 h-[2px] w-16 bg-primary/60 rounded-full" />
+  </div>
+);
+
+// =====================================================================
+// SECTION: SUBCOMPONENT – Portfolio Grid (responsive count + shape,
+// auto-sized rows so missing photos never leave a black gap)
+// =====================================================================
+const PortfolioGrid = ({ events, onCardClick, breakpoint }) => {
+  const { count, gridClass } = GRID_CONFIG[breakpoint];
+  const preview = events.slice(0, Math.min(count, events.length));
+
   return (
-    <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-background">
-      <div className="flex flex-col md:flex-row justify-between items-baseline mb-stack-lg gap-4">
-        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface uppercase italic">
-          Portfolio
-        </h2>
-        <div className="flex gap-stack-lg overflow-x-auto pb-4 no-scrollbar">
-          {FILTERS.map((filter, i) =>
-            i === 0 ? (
-              <span
-                key={filter}
-                className="font-label-caps text-label-caps text-primary border-b border-primary pb-1 cursor-pointer"
-              >
-                {filter}
-              </span>
-            ) : (
-              <span
-                key={filter}
-                className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors cursor-pointer strikethrough-hover uppercase"
-              >
-                {filter}
-              </span>
-            )
+    <div className={`grid ${gridClass} gap-3 md:gap-3 lg:gap-4`}>
+      {preview.map((event) => (
+        <div
+          key={event.eventId}
+          className="aspect-[4/3] overflow-hidden rounded-2xl"
+        >
+          <CoverCard event={event} onClick={() => onCardClick(event.type)} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// =====================================================================
+// SECTION: MAIN COMPONENT – Portfolio
+// =====================================================================
+export default function Portfolio() {
+  const navigate = useNavigate();
+  const { events, loading, error } = useEvents();
+  const breakpoint = useBreakpoint();
+
+  const sortedEvents = [...events]
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+  const goToGallery = (type) =>
+    navigate(type ? `/portfolio?type=${encodeURIComponent(type)}` : "/portfolio");
+
+  return (
+    // ---- OUTER CONTAINER (normal section spacing) ----
+    <div className="w-full px-4 sm:px-6 lg:px-8 pt-8 md:pt-12 pb-8 md:pb-12 bg-background">
+      <section className="relative w-full">
+        <Container>
+          {/* Title */}
+          <SectionTitle title="Portfolio" />
+
+          {/* Loading state */}
+          {loading && <LoadingSkeleton />}
+
+          {/* Error state */}
+          {error && <ErrorState message="Couldn't load events right now." />}
+
+          {/* Success state – only render if not loading and no error */}
+          {!loading && !error && (
+            <>
+              {sortedEvents.length === 0 && <EmptyState />}
+
+              {sortedEvents.length > 0 && (
+                <>
+                  {/* Grid of covers — responsive count + auto rows */}
+                  <PortfolioGrid
+                    events={sortedEvents}
+                    onCardClick={goToGallery}
+                    breakpoint={breakpoint}
+                  />
+                  {/* See All button – placed outside the grid */}
+                  <SeeAllButton onClick={() => goToGallery()} />
+                </>
+              )}
+            </>
           )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
-        {/* Large Vertical */}
-        <div className="md:col-span-8 group cursor-pointer overflow-hidden relative reveal">
-          <img
-            className="w-full aspect-[4/5] object-cover transition-transform duration-700 group-hover:scale-105"
-            alt={IMAGES.cathedral.alt}
-            src={IMAGES.cathedral.src}
-          />
-          <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <p className="font-label-caps text-label-caps text-primary bg-background/50 backdrop-blur-md px-3 py-1">
-              THE CATHEDRAL UNION
-            </p>
-          </div>
-        </div>
-
-        {/* Small Grid Items */}
-        <div className="md:col-span-4 flex flex-col gap-gutter">
-          <div className="group cursor-pointer overflow-hidden relative reveal">
-            <img
-              className="w-full aspect-[1/1] object-cover transition-transform duration-700 group-hover:scale-105"
-              alt={IMAGES.fashionCloseup.alt}
-              src={IMAGES.fashionCloseup.src}
-            />
-          </div>
-          <div className="group cursor-pointer overflow-hidden relative reveal">
-            <img
-              className="w-full aspect-[1/1] object-cover transition-transform duration-700 group-hover:scale-105"
-              alt={IMAGES.mountains.alt}
-              src={IMAGES.mountains.src}
-            />
-          </div>
-        </div>
-
-        {/* Horizontal Row */}
-        <div className="md:col-span-12 group cursor-pointer overflow-hidden relative reveal mt-gutter">
-          <img
-            className="w-full aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105"
-            alt={IMAGES.event.alt}
-            src={IMAGES.event.src}
-          />
-        </div>
-      </div>
-    </section>
+        </Container>
+      </section>
+    </div>
   );
 }
